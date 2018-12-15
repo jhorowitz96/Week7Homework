@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Giphy Homework</title>
+    <style type="text/css">
+        button,
+        div,
+        form,
+        input {
+            margin: 10px;
+        }
+
+        #add-nba-star {
+            background-color: teal;
+            color: white;
+            margin-left: 20px;
+            padding: 1em;
+        }
+
+        .container {
+            float: right;
+        }
+
+        h1 {
+            margin-left: 50px;
+        }
+
+        body {
+            background-color: lightgray;
+        }
+
+        .players {
+            background-color: teal;
+            color: white;
+            padding: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>NBA Stars</h1>
+
+
+        <div id="buttons-view"></div>
+
+        <form id="nba-form">
+            <label for="nba-input">Star Player: </label>
+            <input type="text" id="nba-input">
+            <br>
+
+
+            <input id="add-nba-star" type="submit" value="Add another player to your lineup!">
+        </form>
+
+        <!-- This is where buttons should be displayed -->
+        <div id="players-view"></div>
+
+        <!-- gifs display  -->
+        <div id="gif-display"></div>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script type="text/javascript">
+
+            var topics = ["Allen Iverson", "Russell Westbrook", "Kobe Bryant", "Joel Embiid"];
+
+
+
+
+            function renderButtons() {
+
+                $("#buttons-view").empty();
+
+                for (var i = 0; i < topics.length; i++) {
+                    var players = $("<button>");
+
+                    players.addClass("players");
+
+                    players.attr("data-name", topics[i]);
+
+                    players.text(topics[i]);
+
+                    $("#buttons-view").append(players);
+                }
+
+
+
+
+                // $("#add-nba-star").on("click", function (event) {
+
+
+                //     event.preventDefault();
+
+                //     var player = $("#nba-input").val().trim();
+
+
+                //     topics.push(player);
+
+                //     renderButtons();
+
+                // });
+
+            };
+            renderButtons();
+
+            $("#add-nba-star").on("click", function (event) {
+
+
+                event.preventDefault();
+
+                var player = $("#nba-input").val().trim();
+
+
+                topics.push(player);
+
+                renderButtons();
+
+            });
+
+            $(document).on("click", ".players", function () {
+
+                var player = $(this).attr("data-name");
+
+
+                var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + player + "&api_key=6tdvQjMhYUGqHuIM8uPxIzpp8CJ8Slu6&limit=10";
+
+
+                $.ajax({
+                    url: queryURL,
+                    method: "GET"
+                }).then(function (response) {
+                    // console.log(response);
+                    // console.log(response.data);
+
+
+                    //  console.log(gifImage)
+
+                    var results = response.data;
+                    console.log(results)
+
+                    for (var i = 0; i < results.length; i++) {
+                        console.log("result i", results[i])
+                        // from w3schools: <img src="pic_trulli.jpg" alt="Italian Trulli">
+                        var image = $("<img>");
+
+                        var gifs = $("<img>").attr("src", results[i].images.downsized_still.url);
+
+                        gifs.attr("data-still", results[i].images.downsized_still.url);
+
+                        gifs.attr("data-animate", results[i].images.downsized.url);
+
+                        $("#gif-display").append("<p> Rating: " + results[i].rating + "</p>")
+
+                        image.attr("src", results[i].images.original.url).attr("alt", results[i].title);
+
+                        $("#gif-display").append(image);
+
+                        $(gifs).on("click", function () {
+                            var state = $(gifs).attr('data-state');
+
+                            if (state === 'still') {
+                                $(gifs).attr('src', $(gifs).attr('data-animate'));
+                                $(gifs).attr('data-state', 'animate');
+                            }
+                            else {
+                                $(gifs).attr('src', $(gifs).attr('data-still'))
+                                $(gifs).attr('data-state', 'still');
+                            }
+
+
+
+                        })
+
+                    }
+
+
+
+
+
+                });
+
+
+
+
+            });
+
+                // $(image).on("click", function () {
+                //             var gifImage = response.data.images.fixed_height_still.url;
+                //             console.log(gifImage)
+
+                //             $("#gif-display").append(gifImage);
+
+
+
+                //         });
+
+
+
+        </script>
+
+
+
+
+</body>
+
+</html>
